@@ -36,12 +36,22 @@ int main(void)
 	assert(G + R + T + 1 <= H * W);
 
 	World world(H, W, G, R, T);
-	world.Display();
-	// int command;
-	// int direction;
-	//
-	// cout << "Select next command [0: move / 1: shoot]: ";
-	// cin >> command;
-	// cout << "Enter the direction [0:up / 1: down / 2: right / 3: left]: ";
-	// cin >> direction;	
+
+	int command;
+	int direction;
+	
+	while(true)
+	{
+		world.Display();
+
+		cout << "Select next command [0: move / 1: shoot]: ";
+		cin >> command;
+		assert(command == 0 || command == 1);
+
+		cout << "Enter the direction [0:up / 1: down / 2: right / 3: left]: ";
+		cin >> direction;
+		assert(0 <= direction || direction <= 3);
+
+		world.Update(command, direction);
+	}
 }

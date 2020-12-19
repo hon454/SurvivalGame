@@ -12,6 +12,8 @@ public:
 	~World();
 	bool IsValid(int x, int y) const;
 	bool IsEmpty(int x, int y) const;
+	bool IsGameWin() const;
+	bool IsGameOver() const;
 	bool CanBreed(int x, int y) const;
 	bool HasEmptyCell() const;
 	bool HasRabbit(int x, int y) const;
@@ -19,17 +21,21 @@ public:
 	bool HasFood(int x, int y) const;
 	bool HasGrass(int x, int y) const;
 
+	bool MovePiece(int x, int y, int newX, int newY);
 	bool AddPiece(Piece* piece);
 	
-	void Update();
+	void Update(int command, int direction);
 	void Display() const;
 private:
 	Cell getEmptyCell() const;
 	void generateGrass();
+	void updateHunter(int command, int direction);
+	void updateTigers();
+	void updateRabbits();
 	void updateGrid();
 private:
 	int mHeight, mWidth;
-	int mNumberOfGrasses, mNumberOfRabbits, mNumberOfTigers;
+	int mNumberOfTigers;
 	int mTimeStep;
 	Piece*** mGrid;
 	Piece*** mNextGrid;

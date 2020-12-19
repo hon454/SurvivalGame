@@ -10,7 +10,7 @@
 using namespace std;
 
 World::World(int H, int W, int G, int R, int T)
-	:mHeight(H), mWidth(W), mNumberOfGrasses(G), mNumberOfRabbits(R), mNumberOfTigers(T), mTimeStep(0)
+	:mHeight(H), mWidth(W), mNumberOfTigers(T), mTimeStep(0)
 {
 	mGrid = new Piece**[mHeight];
 	mNextGrid = new Piece**[mHeight];
@@ -74,6 +74,16 @@ bool World::IsEmpty(int x, int y) const
 	return mGrid[y][x] == nullptr && mNextGrid[y][x] == nullptr;
 }
 
+bool World::IsGameWin() const
+{
+	return mNumberOfTigers == 0;
+}
+
+bool World::IsGameOver() const
+{
+	return mHunter->GetLife() == 0;
+}
+
 bool World::CanBreed(int x, int y) const
 {
 	return IsEmpty(x, y) || HasFood(x, y) || HasGrass(x, y);
@@ -135,6 +145,19 @@ bool World::HasGrass(int x, int y) const
 	return dynamic_cast<Grass*>(mGrid[y][x]) == nullptr;
 }
 
+bool World::MovePiece(int x, int y, int newX, int newY)
+{
+	if (!IsValid(newX, newY) || !IsEmpty(newX, newY))
+	{
+		return false;
+	}
+	
+	mGrid[newY][newX] = mGrid[y][x];
+	mGrid[y][x] = nullptr;
+
+	return true;
+}
+
 bool World::AddPiece(Piece* piece)
 {
 	int x = piece->GetX();
@@ -149,9 +172,12 @@ bool World::AddPiece(Piece* piece)
 	return true;
 }
 
-void World::Update()
+void World::Update(int command, int direction)
 {
 	// Hunter¡¯s action ¡æ Tiger¡¯s action ¡æ Rabbit¡¯s action ¡æ Grass generation
+
+	updateHunter(command, direction);
+	++mTimeStep;
 }
 
 void World::Display() const
@@ -213,6 +239,28 @@ void World::generateGrass()
 		int y = cell.GetY();
 		mNextGrid[y][x] = new Grass(*this, x, y);
 	}
+}
+
+void World::updateHunter(int command, int direction)
+{
+	// Move
+	if (command == 0)
+	{
+		mHunter->Move(direction);
+	}
+	// Shoot
+	else if (command == 1)
+	{
+		
+	}
+}
+
+void World::updateTigers()
+{
+}
+
+void World::updateRabbits()
+{
 }
 
 void World::updateGrid()

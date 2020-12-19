@@ -29,8 +29,8 @@ void Critter::Move(int direction)
     }
 
     if (mWorld.IsValid(newX, newY) && mWorld.IsEmpty(newX, newY))
-    {
-        // w.moveCritter(x, y, nx, ny);
+    {    	
+        mWorld.MovePiece(mX, mY, newX, newY);
         mX = newX;
         mY = newY;
     }
