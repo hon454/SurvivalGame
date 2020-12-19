@@ -10,7 +10,7 @@ bool Rabbit::Bread()
 		return false;
 	}
 
-	if (mWorld.IsNoEmptyCell())
+	if (!mWorld.HasEmptyCell())
 	{
 		return false;
 	}
@@ -43,7 +43,7 @@ bool Rabbit::Bread()
 		index = (index + 1) % 4;
 	}
 
-	Rabbit* child;
+	Rabbit* child = nullptr;
 	switch (index)
 	{
 	case 0:

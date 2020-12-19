@@ -5,10 +5,6 @@
 class Hunter : public Critter
 {
 public:
-	Hunter(World& world, int x, int y, int life);
-	void Move(int direction);
-	void Shoot(int direction);
+	Hunter(World& w, int x, int y) : Critter(w, x, y, 'H', 7) {}
 private:
-	int mLife;
-	World& mWorld;
 };

@@ -25,6 +25,28 @@ World::World(int H, int W, int G, int R, int T)
 			mNextGrid[i][j] = nullptr;
 		}
 	}
+
+	Cell emptyCell = getEmptyCell();
+	mHunter = new Hunter(*this, emptyCell.GetX(), emptyCell.GetY());
+	AddPiece(mHunter);
+
+	for (int i = 0; i < G; ++i)
+	{
+		emptyCell = getEmptyCell();
+		AddPiece(new Grass(*this, emptyCell.GetX(), emptyCell.GetY()));
+	}
+
+	for (int i = 0; i < R; ++i)
+	{
+		emptyCell = getEmptyCell();
+		AddPiece(new Rabbit(*this, emptyCell.GetX(), emptyCell.GetY()));
+	}
+
+	for (int i = 0; i < T; ++i)
+	{
+		emptyCell = getEmptyCell();
+		AddPiece(new Tiger(*this, emptyCell.GetX(), emptyCell.GetY()));
+	}
 }
 
 World::~World()
@@ -57,20 +79,20 @@ bool World::CanBreed(int x, int y) const
 	return IsEmpty(x, y) || HasFood(x, y) || HasGrass(x, y);
 }
 
-bool World::IsNoEmptyCell() const
+bool World::HasEmptyCell() const
 {
-	bool isNoEmpyCell = true;
+	bool hasEmptyCell = false;
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
 		{
-			if (mGrid[i][j] != nullptr)
+			if (mGrid[i][j] == nullptr)
 			{
-				isNoEmpyCell = false;
+				hasEmptyCell = true;
 			}
 		}
 	}
-	return isNoEmpyCell;
+	return hasEmptyCell;
 }
 
 bool World::HasRabbit(int x, int y) const
@@ -140,30 +162,30 @@ void World::Display() const
 	}
 	cout << endl << endl;
 
-	cout << "Time Step: " << mTimeStep << "\t\t" << "Life: " << 7 << endl;
+	cout << "Time Step: " << mTimeStep << "\t\t" << "Life: " << mHunter->GetLife() << endl;
 
-	char c;
+	char initial;
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
 		{
 			if (mGrid[i][j] == nullptr)
 			{
-				c = '-';
+				initial = '-';
 			}
 			else
 			{
-				c = ' ';
+				initial = mGrid[i][j]->GetInitial();
 			}
-			cout << c << ' ';
+			cout << initial << ' ';
 		}
-		std::cout << '\n';
+		cout << '\n';
 	}
 }
 
 Cell World::getEmptyCell() const
 {
-	if (IsNoEmptyCell())
+	if (!HasEmptyCell())
 	{
 		return Cell(-1, -1);
 	}
@@ -177,7 +199,7 @@ Cell World::getEmptyCell() const
 		if (IsEmpty(x, y)) break;
 	}
 
-	return Cell(x, y);
+	return Cell(y, x);
 }
 
 void World::generateGrass()

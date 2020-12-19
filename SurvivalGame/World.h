@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cell.h"
+#include "Hunter.h"
 #include "Piece.h"
 
 class World
@@ -12,7 +13,7 @@ public:
 	bool IsValid(int x, int y) const;
 	bool IsEmpty(int x, int y) const;
 	bool CanBreed(int x, int y) const;
-	bool IsNoEmptyCell() const;
+	bool HasEmptyCell() const;
 	bool HasRabbit(int x, int y) const;
 	bool HasTiger(int x, int y) const;
 	bool HasFood(int x, int y) const;
@@ -32,6 +33,7 @@ private:
 	int mTimeStep;
 	Piece*** mGrid;
 	Piece*** mNextGrid;
+	Hunter* mHunter;
 };
 
 

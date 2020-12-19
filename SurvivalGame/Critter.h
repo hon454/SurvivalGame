@@ -9,6 +9,9 @@ public:
 	virtual ~Critter() = default;
 	virtual void Move(int direction);
 	virtual void Move();
+
+	int GetLife() const { return mLife; }
+	int GetAliveStep() const { return mAliveStep; }
 protected:
 	int mLife;
 	int mAliveStep;
