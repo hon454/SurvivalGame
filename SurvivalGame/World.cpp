@@ -13,16 +13,13 @@ World::World(int H, int W, int G, int R, int T)
 	:mHeight(H), mWidth(W), mNumberOfTigers(T), mTimeStep(0)
 {
 	mGrid = new Piece**[mHeight];
-	mNextGrid = new Piece**[mHeight];
 	
 	for (int i = 0; i < mHeight; ++i)
 	{
 		mGrid[i] = new Piece*[mWidth];
-		mNextGrid[i] = new Piece*[mWidth];
 		for (int j = 0; j < mWidth; ++j)
 		{
 			mGrid[i][j] = nullptr;
-			mNextGrid[i][j] = nullptr;
 		}
 	}
 
@@ -105,42 +102,42 @@ bool World::HasEmptyCell() const
 
 bool World::HasRabbit(int x, int y) const
 {
-	if (mGrid[y][x] == nullptr)
+	if (IsEmpty(x, y))
 	{
 		return false;
 	}
 
-	return dynamic_cast<Critter*>(mGrid[y][x]) == nullptr;
+	return dynamic_cast<Rabbit*>(mGrid[y][x]) != nullptr;
 }
 
 bool World::HasTiger(int x, int y) const
 {
-	if (mGrid[y][x] == nullptr)
+	if (IsEmpty(x, y))
 	{
 		return false;
 	}
 
-	return dynamic_cast<Critter*>(mGrid[y][x]) == nullptr;
+	return dynamic_cast<Tiger*>(mGrid[y][x]) != nullptr;
 }
 
 bool World::HasFood(int x, int y) const
 {
-	if (mGrid[y][x] == nullptr)
+	if (IsEmpty(x, y))
 	{
 		return false;
 	}
 
-	return dynamic_cast<Critter*>(mGrid[y][x]) == nullptr;
+	return dynamic_cast<Food*>(mGrid[y][x]) != nullptr;
 }
 
 bool World::HasGrass(int x, int y) const
 {
-	if (mGrid[y][x] == nullptr)
+	if (IsEmpty(x, y))
 	{
 		return false;
 	}
 
-	return dynamic_cast<Grass*>(mGrid[y][x]) == nullptr;
+	return dynamic_cast<Grass*>(mGrid[y][x]) != nullptr;
 }
 
 bool World::MovePiece(int x, int y, int newX, int newY)
@@ -154,6 +151,13 @@ bool World::MovePiece(int x, int y, int newX, int newY)
 	mGrid[y][x] = nullptr;
 
 	return true;
+}
+
+Piece* World::RemovePiece(int x, int y)
+{
+	Piece* removed = mGrid[y][x];
+	mGrid[y][x] = nullptr;
+	return removed;
 }
 
 bool World::AddPiece(Piece* piece)
@@ -174,7 +178,26 @@ void World::Update(int command, int direction)
 {
 	// Hunter’s action → Tiger’s action → Rabbit’s action → Grass generation
 	updateHunter(command, direction);
+	updateTigers();
+	updateRabbits();
+	
 	generateGrass();
+
+	// 생명체들의 life감소, aliveStep 증가, 행동 가능 초기화
+	for (int i = 0; i < mHeight; ++i)
+	{
+		for (int j = 0; j < mWidth; ++j)
+		{
+			Critter* pCritter = dynamic_cast<Critter*>(mGrid[i][j]);			
+			if (pCritter == nullptr)
+			{
+				continue;
+			}
+
+			pCritter->Alive();
+		}
+	}
+	
 	++mTimeStep;
 }
 
@@ -212,13 +235,22 @@ bool World::getEmptyCell(int& x, int& y) const
 
 void World::generateGrass()
 {
-	const int probability = rand() % 10;
-	if (probability == 0)
+	// 10분의 1의 확률
+	if (rand() % 10 > 0)
 	{
-		int x, y;
-		getEmptyCell(x, y);
-		mGrid[y][x] = new Grass(*this, x, y);
+		return;
 	}
+
+	int x, y;
+	
+	// 빈 칸을 획득하는데 실패할 경우 생략
+	if (!getEmptyCell(x, y))
+	{
+		return;
+	}
+
+	// 획득한 빈 칸에 Grass 생성
+	mGrid[y][x] = new Grass(*this, x, y);
 }
 
 void World::updateHunter(int command, int direction)
@@ -226,7 +258,7 @@ void World::updateHunter(int command, int direction)
 	// Move
 	if (command == 0)
 	{
-		mHunter->Move(direction);
+		// mHunter->Move(direction);
 	}
 	// Shoot
 	else if (command == 1)
@@ -237,20 +269,53 @@ void World::updateHunter(int command, int direction)
 
 void World::updateTigers()
 {
+	
 }
 
 void World::updateRabbits()
 {
-}
-
-void World::updateGrid()
-{
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
-		{
-			mGrid[i][j] = mNextGrid[i][j];
-			mNextGrid[i][j] = nullptr;
+		{			
+			Rabbit* pRabbit = dynamic_cast<Rabbit*>(mGrid[i][j]);
+
+			// 토끼가 아닌 경우 생략
+			if (pRabbit == nullptr)
+			{
+				continue;			
+			}
+			
+			// 토끼의 체력이 0일 때
+			if (pRabbit->GetLife() == 0)
+			{
+				// 음식 위에 있었을 경우 토끼 자리에 음식을 배치
+				Piece* food = pRabbit->GetObscuredFood();
+				if (food != nullptr)
+				{
+					mGrid[i][j] = food;
+					delete pRabbit;
+					continue;
+				}
+				RemovePiece(j, i);
+				delete pRabbit;
+				continue;
+			}
+
+			// 이미 활동 한 토끼인 경우 생략
+			if (pRabbit->IsActioned())
+			{
+				continue;
+			}
+
+			cout << j << ", " << i << ": " << pRabbit->GetLife() << endl;
+			
+			if (pRabbit->Breed())
+			{
+				continue;
+			}
+			
+			pRabbit->Move();
 		}
 	}
 }

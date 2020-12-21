@@ -21,6 +21,7 @@ public:
 	bool HasGrass(int x, int y) const;
 
 	bool MovePiece(int x, int y, int newX, int newY);
+	Piece* RemovePiece(int x, int y);
 	bool AddPiece(Piece* piece);
 	
 	void Update(int command, int direction);
@@ -31,14 +32,12 @@ private:
 	void updateHunter(int command, int direction);
 	void updateTigers();
 	void updateRabbits();
-	void updateGrid();
 	void showGrid() const;
 private:
 	int mHeight, mWidth;
 	int mNumberOfTigers;
 	int mTimeStep;
 	Piece*** mGrid;
-	Piece*** mNextGrid;
 	Hunter* mHunter;
 };
 

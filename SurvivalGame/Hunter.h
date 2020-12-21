@@ -7,7 +7,7 @@ class Hunter : public Critter
 {
 public:
 	Hunter(World& w, int x, int y) : Critter(w, x, y, 'H', 7) {}
-	Grass* GetStandingGrass() const { return mStandingGrass; }
+	Grass* GetObscuredGrass() const { return mObscuredGrass; }
 private:
-	Grass* mStandingGrass = nullptr;
+	Grass* mObscuredGrass = nullptr;
 };
