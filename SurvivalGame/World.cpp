@@ -12,8 +12,8 @@ using namespace std;
 World::World(int H, int W, int G, int R, int T)
 	:mHeight(H), mWidth(W), mTimeStep(1)
 {
-	mGrid = new Piece**[mHeight];
-	
+	// 그리드 동적 배열 구성 및 
+	mGrid = new Piece**[mHeight];	
 	for (int i = 0; i < mHeight; ++i)
 	{
 		mGrid[i] = new Piece*[mWidth];
@@ -24,22 +24,27 @@ World::World(int H, int W, int G, int R, int T)
 	}
 
 	int x, y;
+
+	// 사냥꾼 생성
 	getEmptyCell(x, y);
 	mHunter = new Hunter(*this, x, y);
 	AddPiece(mHunter);
-	
+
+	// 토끼 생성
 	for (int i = 0; i < R; ++i)
 	{
 		getEmptyCell(x, y);
 		AddPiece(new Rabbit(*this, x, y));
 	}
 
+	// 호랑이 생성
 	for (int i = 0; i < T; ++i)
 	{
 		getEmptyCell(x, y);
 		AddPiece(new Tiger(*this, x, y));
 	}
 
+	// 풀 생성
 	for (int i = 0; i < G; ++i)
 	{
 		getEmptyCell(x, y);
@@ -49,6 +54,7 @@ World::World(int H, int W, int G, int R, int T)
 
 World::~World()
 {
+	// 메모리 해제
     for (int i = 0; i < mHeight; ++i)
     {
         for (int j = 0; j < mWidth; ++j)
@@ -71,7 +77,8 @@ bool World::IsEmpty(int x, int y) const
 }
 
 bool World::IsGameWin() const
-{	
+{
+	// 호랑이가 남아있는지 검색
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
@@ -166,7 +173,8 @@ bool World::MovePiece(int x, int y, int newX, int newY)
 	{
 		return false;
 	}
-	
+
+	// 이동 후 기존 위치 초기화
 	mGrid[newY][newX] = mGrid[y][x];
 	mGrid[y][x] = nullptr;
 
@@ -210,11 +218,12 @@ void World::KillHunter()
 
 void World::Update(int command, int direction)
 {
-	// Hunter’s action → Tiger’s action → Rabbit’s action → Grass generation
+	// 사냥꾼, 호랑이, 토끼 순으로 업데이트 진행
 	updateHunter(command, direction);
 	updateTigers();
 	updateRabbits();
-	
+
+	// 풀 생성
 	generateGrass();
 
 	// 생명체들의 life감소, aliveStep 증가, 행동 가능 초기화
@@ -230,25 +239,21 @@ void World::Update(int command, int direction)
 
 			pCritter->Alive();
 
+			// 체력이 0이 된 Critter 들을 사망처리 한다.
 			if (pCritter->GetLife() <= 0)
 			{
-				// 음식 위에 있었을 경우 토끼 자리에 음식을 배치
+				// 겹친 Piece가 있을 경우, 복원
 				Piece* obscured = pCritter->GetObscured();
 				if (obscured != nullptr)
 				{
-					mGrid[i][j] = obscured;
-					if (mHunter->GetLife() <= 0)
-					{
-						KillHunter();
-					}
-					else
-					{
-						delete pCritter;
-					}
-					continue;
+					mGrid[i][j] = obscured;					
 				}
-				
-				RemovePiece(j, i);
+				else
+				{
+					RemovePiece(j, i);
+				}
+
+				// 이 생명체가 헌터인 경우 
 				if (mHunter->GetLife() <= 0)
 				{
 					KillHunter();
@@ -273,6 +278,7 @@ void World::Display() const
 	cout << endl << endl;
 
 	int hunterLife = 0;
+	// 사냥꾼이 살아있는 경우에만 hunterLife를 갱신
 	if (mHunter != nullptr)
 	{
 		hunterLife = mHunter->GetLife();
@@ -284,7 +290,7 @@ void World::Display() const
 }
 
 bool World::getEmptyCell(int& x, int& y) const
-{
+{	
 	if (!HasEmptyCell())
 	{
 		return false;
@@ -324,12 +330,10 @@ void World::generateGrass()
 
 void World::updateHunter(int command, int direction)
 {	
-	// Move
 	if (command == 0)
 	{
 		mHunter->Move(direction);
 	}
-	// Shoot
 	else if (command == 1)
 	{
 		mHunter->Shoot(direction);

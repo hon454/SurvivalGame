@@ -74,6 +74,7 @@ void Hunter::Shoot(int direction)
 	int deltaY = 0;
 
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
+	// 방향에 따라 추가 되는 delta 값을 설정
 	switch (direction)
 	{
 	case 0:
@@ -91,12 +92,14 @@ void Hunter::Shoot(int direction)
 	default:
 		assert("Not Valid Direction");
 	}
-
+	
 	int targetX = mX + deltaX;
 	int targetY = mY + deltaY;
 
+	// 타겟의 위치가 그리드 밖으로 나갈 때 까지 반복
 	while(mWorld.IsValid(targetX, targetY))
 	{
+		// 만약 동물이라면 죽이고 음식을 생성
 		if (mWorld.HasRabbit(targetX, targetY) || mWorld.HasTiger(targetX, targetY))
 		{
 			Critter* killed = dynamic_cast<Critter*>(mWorld.RemovePiece(targetX, targetY));	

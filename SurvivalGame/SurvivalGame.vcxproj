@@ -29,7 +29,6 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Critter.cpp" />
     <ClCompile Include="Hunter.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Rabbit.cpp" />

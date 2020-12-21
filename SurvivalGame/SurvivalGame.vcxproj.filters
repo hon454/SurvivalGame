@@ -47,9 +47,6 @@
     <ClCompile Include="Hunter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Critter.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Rabbit.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>

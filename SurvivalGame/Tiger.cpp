@@ -15,7 +15,7 @@ bool Tiger::Breed()
 	}
 
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
-	bool adjacentCell[4] =
+	bool breedableCell[4] =
 	{
 		mWorld.IsValid(mX, mY - 1) && mWorld.CanBreed(mX, mY - 1),
 		mWorld.IsValid(mX, mY + 1) && mWorld.CanBreed(mX, mY + 1),
@@ -26,7 +26,7 @@ bool Tiger::Breed()
 	int breedableCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
-		if (adjacentCell[i])
+		if (breedableCell[i])
 		{
 			++breedableCellCount;
 		}
@@ -38,11 +38,12 @@ bool Tiger::Breed()
 	}
 
 	int index = rand() % breedableCellCount;
-	while (adjacentCell[index] == false)
+	while (breedableCell[index] == false)
 	{
 		index = (index + 1) % 4;
 	}
 
+	// 새끼를 낳을 수 있는 방향의 공간에 새끼를 생성
 	Tiger* child = nullptr;
 	switch (index)
 	{
@@ -62,7 +63,7 @@ bool Tiger::Breed()
 		assert("Not Valid Index");
 	}
 
-	// 새로 태어난 개체는 움직이지 않도록 설정.
+	// 새로 태어난 새끼는 움직이지 않도록 설정.
 	child->mIsActioned = true;
 
 	mWorld.AddPiece(child);
@@ -82,6 +83,7 @@ void Tiger::Move()
 		mWorld.IsValid(mX - 1, mY) && !mWorld.HasTiger(mX - 1, mY)
 	};
 
+	// 움직일 수 있는 셀을 확인
 	int moveableCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -96,6 +98,7 @@ void Tiger::Move()
 		return;
 	}
 
+	// 사냥꾼이 존재하는 셀을 확인
 	bool hunterCell[4] =
 	{
 		moveableCell[0] && mWorld.HasHunter(mX, mY - 1),
@@ -113,6 +116,7 @@ void Tiger::Move()
 		}
 	}
 
+	// 토끼가 존재하는 셀을 확인
 	bool rabbitCell[4] =
 	{
 		moveableCell[0] && mWorld.HasRabbit(mX, mY - 1),

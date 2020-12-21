@@ -14,7 +14,8 @@ bool Rabbit::Breed()
 	}
 
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
-	bool adjacentCell[4] =
+	// 새끼를 낳을 수 있는 공간 확인
+	bool breedableCell[4] =
 	{
 		mWorld.IsValid(mX, mY - 1) && mWorld.CanBreed(mX, mY - 1),
 		mWorld.IsValid(mX, mY + 1) && mWorld.CanBreed(mX, mY + 1),
@@ -22,22 +23,25 @@ bool Rabbit::Breed()
 		mWorld.IsValid(mX - 1, mY) && mWorld.CanBreed(mX - 1, mY)
 	};
 
+	// 새끼를 낳을 수 있는 공간 개수 확인
 	int breedableCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
-		if (adjacentCell[i])
+		if (breedableCell[i])
 		{
 			++breedableCellCount;
 		}
 	}
 
+	// 공간이 없으면 생략
 	if (breedableCellCount == 0)
 	{
 		return false;
 	}
 
+	// 새끼를 낳을 수 있는 공간 중 랜덤하게 선택
 	int index = rand() % breedableCellCount;
-	while (adjacentCell[index] == false)
+	while (breedableCell[index] == false)
 	{
 		index = (index + 1) % 4;
 	}
@@ -73,7 +77,7 @@ void Rabbit::Move()
 {
 	mIsActioned = true;
 	
-	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
+	// 움직일 수 있는 셀 확인
 	bool moveableCell[4] =
 	{
 		mWorld.IsValid(mX, mY - 1) && (mWorld.IsEmpty(mX, mY - 1) || mWorld.HasFood(mX, mY - 1) || mWorld.HasGrass(mX, mY - 1)),
@@ -95,7 +99,8 @@ void Rabbit::Move()
 	{
 		return;
 	}
-
+	
+	// 풀이 있는 셀 확인
 	bool grassCell[4] =
 	{
 		moveableCell[0] && mWorld.HasGrass(mX, mY - 1),
@@ -136,6 +141,8 @@ void Rabbit::Move()
 	int newX = mX;
 	int newY = mY;
 
+	// 선택된 방향쪽으로 새로운 좌표 대입
+	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
 	switch (direction)
 	{
 	case 0:
