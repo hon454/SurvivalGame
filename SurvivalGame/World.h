@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WORLD_H
+#define WORLD_H
 
 #include "Hunter.h"
 #include "Piece.h"
@@ -41,6 +42,8 @@ private:
 	Piece*** mGrid;
 	Hunter* mHunter;
 };
+
+#endif
 
 
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HUNTER_H
+#define HUNTER_H
 
 #include "Critter.h"
 #include "Grass.h"
@@ -11,3 +12,6 @@ public:
 	void Shoot(int direction);
 private:
 };
+
+#endif
+

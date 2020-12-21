@@ -1,4 +1,6 @@
-#pragma once
+#ifndef RABBIT_H
+#define RABBIT_H
+
 #include "Critter.h"
 #include "Food.h"
 
@@ -10,3 +12,6 @@ public:
 	void Move();
 private:
 };
+
+#endif
+

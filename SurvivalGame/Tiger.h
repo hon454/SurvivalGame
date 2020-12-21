@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TIGER_H
+#define TIGER_H
+
 #include "Critter.h"
 
 class Tiger : public Critter
@@ -9,3 +11,5 @@ public:
 	void Move();
 private:
 };
+
+#endif

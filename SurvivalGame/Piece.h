@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PIECE_H
+#define PIECE_H
 
 class World;
 
@@ -15,3 +16,5 @@ protected:
 	char mInitial;
 	World& mWorld;
 };
+
+#endif
