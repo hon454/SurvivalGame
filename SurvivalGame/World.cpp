@@ -10,7 +10,7 @@
 using namespace std;
 
 World::World(int H, int W, int G, int R, int T)
-	:mHeight(H), mWidth(W), mNumberOfTigers(T), mTimeStep(1)
+	:mHeight(H), mWidth(W), mTimeStep(1)
 {
 	mGrid = new Piece**[mHeight];
 	
@@ -71,8 +71,18 @@ bool World::IsEmpty(int x, int y) const
 }
 
 bool World::IsGameWin() const
-{
-	return mNumberOfTigers == 0;
+{	
+	for (int i = 0; i < mHeight; ++i)
+	{
+		for (int j = 0; j < mWidth; ++j)
+		{
+			if (dynamic_cast<Tiger*>(mGrid[i][j]) != nullptr)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 bool World::IsGameOver() const
@@ -187,6 +197,13 @@ bool World::AddPiece(Piece* piece)
 void World::KillHunter()
 {
 	RemovePiece(mHunter->GetX(), mHunter->GetY());
+
+	// 겹쳐있는 것이 있었다면 복원
+	Piece* obscured = mHunter->GetObscured();
+	if (obscured != nullptr)
+	{
+		AddPiece(obscured);
+	}
 	delete mHunter;
 	mHunter = nullptr;
 }

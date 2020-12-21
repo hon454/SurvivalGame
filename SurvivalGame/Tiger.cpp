@@ -193,7 +193,12 @@ void Tiger::Move()
 	// 토끼가 있다면 제거 후 life를 최대치로
 	else if (mWorld.HasRabbit(newX, newY))
 	{
-		Piece* rabbit = mWorld.RemovePiece(newX, newY);
+		Critter* rabbit = dynamic_cast<Critter*>(mWorld.RemovePiece(newX, newY));
+		Piece* obscured = rabbit->GetObscured();
+		if (obscured != nullptr)
+		{
+			mWorld.AddPiece(obscured);
+		}
 		delete rabbit;
 
 		mLife = 7;

@@ -37,7 +37,6 @@ private:
 	void showGrid() const;
 private:
 	int mHeight, mWidth;
-	int mNumberOfTigers;
 	int mTimeStep;
 	Piece*** mGrid;
 	Hunter* mHunter;
