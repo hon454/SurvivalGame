@@ -9,9 +9,6 @@ public:
 		: Piece(w, x, y, initial), mLife(life), mAliveStep(1), mIsActioned(false) {}
 	virtual ~Critter() = default;
 	
-	virtual void Move(int direction) {}
-	virtual void Move() {}
-
 	void Alive()
 	{
 		--mLife;
