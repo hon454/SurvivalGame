@@ -89,12 +89,39 @@ bool World::IsGameWin() const
 			}
 		}
 	}
+
+	cout << "Tigers are all dead" << endl;
 	return true;
 }
 
 bool World::IsGameOver() const
 {
-	return mHunter == nullptr;
+	if (mHunter == nullptr)
+	{
+		if (mIsHunterStarved)
+		{
+			cout << "Hunter starved to death";
+		}
+		else
+		{
+			cout << "Hunter is dead";
+		}
+		return true;
+	}
+	
+	for (int i = 0; i < mHeight; ++i)
+	{
+		for (int j = 0; j < mWidth; ++j)
+		{
+			if (dynamic_cast<Rabbit*>(mGrid[i][j]) != nullptr)
+			{
+				return false;
+			}
+		}
+	}
+	
+	cout << "Rabbits are gone" << endl;
+	return true;
 }
 
 bool World::CanBreed(int x, int y) const
@@ -257,6 +284,7 @@ void World::Update(int command, int direction)
 				if (mHunter->GetLife() <= 0)
 				{
 					KillHunter();
+					mIsHunterStarved = true;
 				}
 				else
 				{
@@ -288,6 +316,8 @@ void World::Display() const
 	cout << "Time Step: " << mTimeStep << "\t\t" << "Life: " << hunterLife << endl;
 
 	showGrid();
+
+	cout << endl;
 }
 
 bool World::getEmptyCell(int& x, int& y) const

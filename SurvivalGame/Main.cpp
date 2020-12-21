@@ -46,12 +46,12 @@ int main(void)
 
 		if (world.IsGameOver())
 		{
-			cout << "\nGame Over" << endl;
+			cout << "Game Over!" << endl;
 			break;
 		}
 		else if (world.IsGameWin())
 		{
-			cout << "\nGame Win" << endl;
+			cout << "You Win!" << endl;
 			break;
 		}
 

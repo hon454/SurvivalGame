@@ -41,6 +41,7 @@ private:
 	int mTimeStep;
 	Piece*** mGrid;
 	Hunter* mHunter;
+	bool mIsHunterStarved = false;;
 };
 
 #endif
