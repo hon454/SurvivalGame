@@ -26,26 +26,27 @@ World::World(int H, int W, int G, int R, int T)
 		}
 	}
 
-	Cell emptyCell = getEmptyCell();
-	mHunter = new Hunter(*this, emptyCell.GetX(), emptyCell.GetY());
+	int x, y;
+	getEmptyCell(x, y);
+	mHunter = new Hunter(*this, x, y);
 	AddPiece(mHunter);
-
-	for (int i = 0; i < G; ++i)
-	{
-		emptyCell = getEmptyCell();
-		AddPiece(new Grass(*this, emptyCell.GetX(), emptyCell.GetY()));
-	}
-
+	
 	for (int i = 0; i < R; ++i)
 	{
-		emptyCell = getEmptyCell();
-		AddPiece(new Rabbit(*this, emptyCell.GetX(), emptyCell.GetY()));
+		getEmptyCell(x, y);
+		AddPiece(new Rabbit(*this, x, y));
 	}
 
 	for (int i = 0; i < T; ++i)
 	{
-		emptyCell = getEmptyCell();
-		AddPiece(new Tiger(*this, emptyCell.GetX(), emptyCell.GetY()));
+		getEmptyCell(x, y);
+		AddPiece(new Tiger(*this, x, y));
+	}
+
+	for (int i = 0; i < G; ++i)
+	{
+		getEmptyCell(x, y);
+		AddPiece(new Grass(*this, x, y));
 	}
 }
 
@@ -58,10 +59,8 @@ World::~World()
 			delete mGrid[i][j];
         }
         delete[] mGrid[i];
-		delete[] mNextGrid[i];
     }
     delete[] mGrid;
-	delete[] mNextGrid;
 }
 
 bool World::IsValid(int x, int y) const
@@ -71,7 +70,7 @@ bool World::IsValid(int x, int y) const
 
 bool World::IsEmpty(int x, int y) const
 {
-	return mGrid[y][x] == nullptr && mNextGrid[y][x] == nullptr;
+	return mGrid[y][x] == nullptr;
 }
 
 bool World::IsGameWin() const
@@ -91,18 +90,17 @@ bool World::CanBreed(int x, int y) const
 
 bool World::HasEmptyCell() const
 {
-	bool hasEmptyCell = false;
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
 		{
 			if (mGrid[i][j] == nullptr)
 			{
-				hasEmptyCell = true;
+				return true;
 			}
 		}
 	}
-	return hasEmptyCell;
+	return false;
 }
 
 bool World::HasRabbit(int x, int y) const
@@ -175,8 +173,8 @@ bool World::AddPiece(Piece* piece)
 void World::Update(int command, int direction)
 {
 	// Hunter¡¯s action ¡æ Tiger¡¯s action ¡æ Rabbit¡¯s action ¡æ Grass generation
-
 	updateHunter(command, direction);
+	generateGrass();
 	++mTimeStep;
 }
 
@@ -190,54 +188,36 @@ void World::Display() const
 
 	cout << "Time Step: " << mTimeStep << "\t\t" << "Life: " << mHunter->GetLife() << endl;
 
-	char initial;
-	for (int i = 0; i < mHeight; ++i)
-	{
-		for (int j = 0; j < mWidth; ++j)
-		{
-			if (mGrid[i][j] == nullptr)
-			{
-				initial = '-';
-			}
-			else
-			{
-				initial = mGrid[i][j]->GetInitial();
-			}
-			cout << initial << ' ';
-		}
-		cout << '\n';
-	}
+	showGrid();
 }
 
-Cell World::getEmptyCell() const
+bool World::getEmptyCell(int& x, int& y) const
 {
 	if (!HasEmptyCell())
 	{
-		return Cell(-1, -1);
-	}
-	
-	int x, y;
+		return false;
+	}		
 	
 	while (true)
 	{
 		x = rand() % mWidth;
 		y = rand() % mHeight;
-		if (IsEmpty(x, y)) break;
+		if (IsEmpty(x, y))
+		{
+			break;
+		}
 	}
-
-	return Cell(y, x);
+	return true;
 }
 
 void World::generateGrass()
 {
-	int probability = rand() % 10;
-
+	const int probability = rand() % 10;
 	if (probability == 0)
 	{
-		Cell cell = getEmptyCell();
-		int x = cell.GetX();
-		int y = cell.GetY();
-		mNextGrid[y][x] = new Grass(*this, x, y);
+		int x, y;
+		getEmptyCell(x, y);
+		mGrid[y][x] = new Grass(*this, x, y);
 	}
 }
 
@@ -272,5 +252,26 @@ void World::updateGrid()
 			mGrid[i][j] = mNextGrid[i][j];
 			mNextGrid[i][j] = nullptr;
 		}
+	}
+}
+
+void World::showGrid() const
+{
+	char initial;
+	for (int i = 0; i < mHeight; ++i)
+	{
+		for (int j = 0; j < mWidth; ++j)
+		{
+			if (mGrid[i][j] == nullptr)
+			{
+				initial = '-';
+			}
+			else
+			{
+				initial = mGrid[i][j]->GetInitial();
+			}
+			cout << initial << ' ';
+		}
+		cout << '\n';
 	}
 }

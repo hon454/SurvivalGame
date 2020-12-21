@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cell.h" />
     <ClInclude Include="Critter.h" />
     <ClInclude Include="Food.h" />
     <ClInclude Include="Grass.h" />

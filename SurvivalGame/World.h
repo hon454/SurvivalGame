@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Cell.h"
 #include "Hunter.h"
 #include "Piece.h"
 
@@ -27,12 +26,13 @@ public:
 	void Update(int command, int direction);
 	void Display() const;
 private:
-	Cell getEmptyCell() const;
+	bool getEmptyCell(int& x, int& y) const;
 	void generateGrass();
 	void updateHunter(int command, int direction);
 	void updateTigers();
 	void updateRabbits();
 	void updateGrid();
+	void showGrid() const;
 private:
 	int mHeight, mWidth;
 	int mNumberOfTigers;
