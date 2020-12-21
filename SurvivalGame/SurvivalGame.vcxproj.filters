@@ -41,9 +41,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Program.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="World.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -54,6 +51,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Rabbit.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Tiger.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

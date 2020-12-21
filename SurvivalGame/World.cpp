@@ -10,7 +10,7 @@
 using namespace std;
 
 World::World(int H, int W, int G, int R, int T)
-	:mHeight(H), mWidth(W), mNumberOfTigers(T), mTimeStep(0)
+	:mHeight(H), mWidth(W), mNumberOfTigers(T), mTimeStep(1)
 {
 	mGrid = new Piece**[mHeight];
 	
@@ -77,7 +77,7 @@ bool World::IsGameWin() const
 
 bool World::IsGameOver() const
 {
-	return mHunter->GetLife() == 0;
+	return mHunter == nullptr;
 }
 
 bool World::CanBreed(int x, int y) const
@@ -98,6 +98,16 @@ bool World::HasEmptyCell() const
 		}
 	}
 	return false;
+}
+
+bool World::HasHunter(int x, int y) const
+{
+	if (IsEmpty(x, y))
+	{
+		return false;
+	}
+
+	return dynamic_cast<Hunter*>(mGrid[y][x]) != nullptr;
 }
 
 bool World::HasRabbit(int x, int y) const
@@ -174,6 +184,13 @@ bool World::AddPiece(Piece* piece)
 	return true;
 }
 
+void World::KillHunter()
+{
+	RemovePiece(mHunter->GetX(), mHunter->GetY());
+	delete mHunter;
+	mHunter = nullptr;
+}
+
 void World::Update(int command, int direction)
 {
 	// Hunter’s action → Tiger’s action → Rabbit’s action → Grass generation
@@ -195,6 +212,35 @@ void World::Update(int command, int direction)
 			}
 
 			pCritter->Alive();
+
+			if (pCritter->GetLife() <= 0)
+			{
+				// 음식 위에 있었을 경우 토끼 자리에 음식을 배치
+				Piece* obscured = pCritter->GetObscured();
+				if (obscured != nullptr)
+				{
+					mGrid[i][j] = obscured;
+					if (mHunter->GetLife() <= 0)
+					{
+						KillHunter();
+					}
+					else
+					{
+						delete pCritter;
+					}
+					continue;
+				}
+				
+				RemovePiece(j, i);
+				if (mHunter->GetLife() <= 0)
+				{
+					KillHunter();
+				}
+				else
+				{
+					delete pCritter;
+				}
+			}
 		}
 	}
 	
@@ -209,7 +255,13 @@ void World::Display() const
 	}
 	cout << endl << endl;
 
-	cout << "Time Step: " << mTimeStep << "\t\t" << "Life: " << mHunter->GetLife() << endl;
+	int hunterLife = 0;
+	if (mHunter != nullptr)
+	{
+		hunterLife = mHunter->GetLife();
+	}
+	
+	cout << "Time Step: " << mTimeStep << "\t\t" << "Life: " << hunterLife << endl;
 
 	showGrid();
 }
@@ -254,22 +306,47 @@ void World::generateGrass()
 }
 
 void World::updateHunter(int command, int direction)
-{
+{	
 	// Move
 	if (command == 0)
 	{
-		// mHunter->Move(direction);
+		mHunter->Move(direction);
 	}
 	// Shoot
 	else if (command == 1)
 	{
-		
+		mHunter->Shoot(direction);
 	}
 }
 
 void World::updateTigers()
 {
-	
+	for (int i = 0; i < mHeight; ++i)
+	{
+		for (int j = 0; j < mWidth; ++j)
+		{
+			Tiger* pTiger = dynamic_cast<Tiger*>(mGrid[i][j]);
+
+			// 호랑이가 아닌 경우 생략
+			if (pTiger == nullptr)
+			{
+				continue;
+			}
+
+			// 이미 활동 한 호랑이인 경우 생략
+			if (pTiger->IsActioned())
+			{
+				continue;
+			}
+
+			if (pTiger->Breed())
+			{
+				continue;
+			}
+
+			pTiger->Move();
+		}
+	}
 }
 
 void World::updateRabbits()
@@ -285,22 +362,6 @@ void World::updateRabbits()
 			{
 				continue;			
 			}
-			
-			// 토끼의 체력이 0일 때
-			if (pRabbit->GetLife() == 0)
-			{
-				// 음식 위에 있었을 경우 토끼 자리에 음식을 배치
-				Piece* food = pRabbit->GetObscuredFood();
-				if (food != nullptr)
-				{
-					mGrid[i][j] = food;
-					delete pRabbit;
-					continue;
-				}
-				RemovePiece(j, i);
-				delete pRabbit;
-				continue;
-			}
 
 			// 이미 활동 한 토끼인 경우 생략
 			if (pRabbit->IsActioned())
@@ -308,8 +369,6 @@ void World::updateRabbits()
 				continue;
 			}
 
-			cout << j << ", " << i << ": " << pRabbit->GetLife() << endl;
-			
 			if (pRabbit->Breed())
 			{
 				continue;
