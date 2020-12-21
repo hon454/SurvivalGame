@@ -271,6 +271,7 @@ void World::Update(int command, int direction)
 
 void World::Display() const
 {
+	cout << endl;
 	for (int i = 0; i < 50; ++i)
 	{
 		cout << "=";
@@ -310,22 +311,16 @@ bool World::getEmptyCell(int& x, int& y) const
 
 void World::generateGrass()
 {
-	// 10ºÐÀÇ 1ÀÇ È®·ü
-	if (rand() % 10 > 0)
+	for (int i = 0; i < mHeight; ++i)
 	{
-		return;
+		for (int j = 0; j < mWidth; ++j)
+		{
+			if (mGrid[i][j] == nullptr && rand() % 10 == 0)
+			{
+				mGrid[i][j] = new Grass(*this, j, i);
+			}
+		}
 	}
-
-	int x, y;
-	
-	// ºó Ä­À» È¹µæÇÏ´Âµ¥ ½ÇÆÐÇÒ °æ¿ì »ý·«
-	if (!getEmptyCell(x, y))
-	{
-		return;
-	}
-
-	// È¹µæÇÑ ºó Ä­¿¡ Grass »ý¼º
-	mGrid[y][x] = new Grass(*this, x, y);
 }
 
 void World::updateHunter(int command, int direction)

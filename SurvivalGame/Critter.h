@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CRITTER_H
+#define CRITTER_H
 
 #include "Piece.h"
 
@@ -26,3 +27,5 @@ protected:
 	bool mIsActioned;
 	Piece* mObscured;
 };
+
+#endif

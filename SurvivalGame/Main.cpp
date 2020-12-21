@@ -59,7 +59,7 @@ int main(void)
 		cin >> command;
 		assert(command == 0 || command == 1);
 
-		cout << "Enter the direction [0:up / 1: down / 2: right / 3: left]: ";
+		cout << "Enter the direction [0: up / 1: down / 2: right / 3: left]: ";
 		cin >> direction;
 		assert(0 <= direction || direction <= 3);
 
