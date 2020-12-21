@@ -39,6 +39,8 @@ int main(void)
 
 	int command;
 	int direction;
+
+	cout << endl;
 	
 	while(true)
 	{
