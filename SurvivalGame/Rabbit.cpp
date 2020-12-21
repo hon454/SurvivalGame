@@ -171,7 +171,7 @@ void Rabbit::Move()
 		Piece* grass = mWorld.RemovePiece(newX, newY);
 		delete grass;
 
-		mLife = 5;
+		mLife = 6;
 	}
 
 	// 음식이 있다면 저장 후 World에서 임시 제거

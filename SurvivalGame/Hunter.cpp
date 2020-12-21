@@ -53,7 +53,7 @@ void Hunter::Move(int direction)
 		Piece* food = mWorld.RemovePiece(newX, newY);
 		delete food;
 
-		mLife = 7;
+		mLife = 8;
 	}
 
 	mWorld.MovePiece(mX, mY, newX, newY);

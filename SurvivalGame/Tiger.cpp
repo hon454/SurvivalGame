@@ -205,7 +205,7 @@ void Tiger::Move()
 		}
 		delete rabbit;
 
-		mLife = 7;
+		mLife = 8;
 	}
 	
 	// 음식이나 Grass가 있다면 저장 후 World에서 임시 제거
