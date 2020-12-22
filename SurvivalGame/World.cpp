@@ -100,11 +100,11 @@ bool World::IsGameOver() const
 	{
 		if (mIsHunterStarved)
 		{
-			cout << "Hunter starved to death";
+			cout << "Hunter starved to death" << endl;
 		}
 		else
 		{
-			cout << "Hunter is dead";
+			cout << "Hunter is dead" << endl;
 		}
 		return true;
 	}
