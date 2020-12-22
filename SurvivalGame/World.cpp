@@ -281,7 +281,7 @@ void World::Update(int command, int direction)
 				}
 
 				// 이 생명체가 헌터인 경우 
-				if (mHunter->GetLife() <= 0)
+				if (mHunter != nullptr && mHunter->GetLife() <= 0)
 				{
 					KillHunter();
 					mIsHunterStarved = true;
