@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
+#include <ctime>
 
 #include "World.h"
 
@@ -9,7 +11,7 @@ int main(void)
 {
 	srand(time(NULL));
 	
-	int H, W, G, R, T;
+	int H, W, G, R, T;	
 	
 	cout << "Enter grid height: ";
 	cin >> H;

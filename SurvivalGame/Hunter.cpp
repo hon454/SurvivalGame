@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstdlib>
 
-
 #include "Food.h"
 #include "World.h"
 
