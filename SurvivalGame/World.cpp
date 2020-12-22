@@ -12,7 +12,7 @@ using namespace std;
 World::World(int H, int W, int G, int R, int T)
 	:mHeight(H), mWidth(W), mTimeStep(1)
 {
-	// 그리드 동적 배열 구성 및 
+	// set grid
 	mGrid = new Piece**[mHeight];	
 	for (int i = 0; i < mHeight; ++i)
 	{
@@ -25,26 +25,26 @@ World::World(int H, int W, int G, int R, int T)
 
 	int x, y;
 
-	// 사냥꾼 생성
+	// add hunter
 	getEmptyCell(x, y);
 	mHunter = new Hunter(*this, x, y);
 	AddPiece(mHunter);
 
-	// 토끼 생성
+	// add rabbit
 	for (int i = 0; i < R; ++i)
 	{
 		getEmptyCell(x, y);
 		AddPiece(new Rabbit(*this, x, y));
 	}
 
-	// 호랑이 생성
+	// add tiger
 	for (int i = 0; i < T; ++i)
 	{
 		getEmptyCell(x, y);
 		AddPiece(new Tiger(*this, x, y));
 	}
 
-	// 풀 생성
+	// add grass
 	for (int i = 0; i < G; ++i)
 	{
 		getEmptyCell(x, y);
@@ -54,7 +54,7 @@ World::World(int H, int W, int G, int R, int T)
 
 World::~World()
 {
-	// 메모리 해제
+	// release memory
     for (int i = 0; i < mHeight; ++i)
     {
         for (int j = 0; j < mWidth; ++j)
@@ -77,12 +77,12 @@ bool World::IsEmpty(int x, int y) const
 }
 
 bool World::IsGameWin() const
-{
-	// 호랑이가 남아있는지 검색
+{	
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
 		{
+			// if tiger is exist, skip
 			if (dynamic_cast<Tiger*>(mGrid[i][j]) != nullptr)
 			{
 				return false;
@@ -201,7 +201,6 @@ bool World::MovePiece(int x, int y, int newX, int newY)
 		return false;
 	}
 
-	// 이동 후 기존 위치 초기화
 	mGrid[newY][newX] = mGrid[y][x];
 	mGrid[y][x] = nullptr;
 
@@ -233,7 +232,7 @@ void World::KillHunter()
 {
 	RemovePiece(mHunter->GetX(), mHunter->GetY());
 
-	// 겹쳐있는 것이 있었다면 복원
+	// restore obscured
 	Piece* obscured = mHunter->GetObscured();
 	if (obscured != nullptr)
 	{
@@ -245,15 +244,14 @@ void World::KillHunter()
 
 void World::Update(int command, int direction)
 {
-	// 사냥꾼, 호랑이, 토끼 순으로 업데이트 진행
+	// update critter
 	updateHunter(command, direction);
 	updateTigers();
 	updateRabbits();
-
-	// 풀 생성
+	
 	generateGrass();
 
-	// 생명체들의 life감소, aliveStep 증가, 행동 가능 초기화
+	// decrease life, increase life step, kill starved critter
 	for (int i = 0; i < mHeight; ++i)
 	{
 		for (int j = 0; j < mWidth; ++j)
@@ -266,10 +264,10 @@ void World::Update(int command, int direction)
 
 			pCritter->Alive();
 
-			// 체력이 0이 된 Critter 들을 사망처리 한다.
+			// remove starved critter
 			if (pCritter->GetLife() <= 0)
 			{
-				// 겹친 Piece가 있을 경우, 복원
+				// if has obscured, restore
 				Piece* obscured = pCritter->GetObscured();
 				if (obscured != nullptr)
 				{
@@ -280,7 +278,7 @@ void World::Update(int command, int direction)
 					RemovePiece(j, i);
 				}
 
-				// 이 생명체가 헌터인 경우 
+				// if critter is hunter, switch mIsHunterStarved
 				if (mHunter != nullptr && mHunter->GetLife() <= 0)
 				{
 					KillHunter();
@@ -307,7 +305,7 @@ void World::Display() const
 	cout << endl << endl;
 
 	int hunterLife = 0;
-	// 사냥꾼이 살아있는 경우에만 hunterLife를 갱신
+	// update when hunter is alive
 	if (mHunter != nullptr)
 	{
 		hunterLife = mHunter->GetLife();
@@ -321,12 +319,14 @@ void World::Display() const
 }
 
 bool World::getEmptyCell(int& x, int& y) const
-{	
+{
+	// if empty cell is not exist, skip
 	if (!HasEmptyCell())
 	{
 		return false;
 	}		
-	
+
+	// randomly select empty cell
 	while (true)
 	{
 		x = rand() % mWidth;
@@ -345,6 +345,7 @@ void World::generateGrass()
 	{
 		for (int j = 0; j < mWidth; ++j)
 		{
+			// generate grass by each empty cell, 10%
 			if (mGrid[i][j] == nullptr && rand() % 10 == 0)
 			{
 				mGrid[i][j] = new Grass(*this, j, i);
@@ -373,13 +374,13 @@ void World::updateTigers()
 		{
 			Tiger* pTiger = dynamic_cast<Tiger*>(mGrid[i][j]);
 
-			// 호랑이가 아닌 경우 생략
+			// if is not tiger, skip
 			if (pTiger == nullptr)
 			{
 				continue;
 			}
 
-			// 이미 활동 한 호랑이인 경우 생략
+			// if is already action, skip
 			if (pTiger->IsActioned())
 			{
 				continue;
@@ -403,18 +404,18 @@ void World::updateRabbits()
 		{			
 			Rabbit* pRabbit = dynamic_cast<Rabbit*>(mGrid[i][j]);
 
-			// 토끼가 아닌 경우 생략
+			// if is not rabbit, skip
 			if (pRabbit == nullptr)
 			{
 				continue;			
 			}
 
-			// 이미 활동 한 토끼인 경우 생략
+			// if is already action, skip
 			if (pRabbit->IsActioned())
 			{
 				continue;
 			}
-
+		
 			if (pRabbit->Breed())
 			{
 				continue;

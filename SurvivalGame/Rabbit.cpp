@@ -7,14 +7,15 @@
 bool Rabbit::Breed()
 {
 	mIsActioned = true;
-	
+
+	// check step
 	if (mAliveStep == 0 || mAliveStep % 7 != 0)
 	{
 		return false;
 	}
 
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
-	// 새끼를 낳을 수 있는 공간 확인
+	// find breedable cells
 	bool breedableCell[4] =
 	{
 		mWorld.IsValid(mX, mY - 1) && mWorld.CanBreed(mX, mY - 1),
@@ -23,7 +24,7 @@ bool Rabbit::Breed()
 		mWorld.IsValid(mX - 1, mY) && mWorld.CanBreed(mX - 1, mY)
 	};
 
-	// 새끼를 낳을 수 있는 공간 개수 확인
+	// count breedable cell
 	int breedableCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -33,13 +34,13 @@ bool Rabbit::Breed()
 		}
 	}
 
-	// 공간이 없으면 생략
+	// if no breedable cells, skip
 	if (breedableCellCount == 0)
 	{
 		return false;
 	}
 
-	// 새끼를 낳을 수 있는 공간 중 랜덤하게 선택
+	// randomly select in breedable cells
 	int index = rand() % breedableCellCount;
 	while (breedableCell[index] == false)
 	{
@@ -65,7 +66,7 @@ bool Rabbit::Breed()
 		assert("Not Valid Index");
 	}
 
-	// 새로 태어난 개체는 움직이지 않도록 설정.
+	// child can not action in currently step
 	child->mIsActioned = true;
 	
 	mWorld.AddPiece(child);	
@@ -77,7 +78,7 @@ void Rabbit::Move()
 {
 	mIsActioned = true;
 	
-	// 움직일 수 있는 셀 확인
+	// find moveable cells
 	bool moveableCell[4] =
 	{
 		mWorld.IsValid(mX, mY - 1) && (mWorld.IsEmpty(mX, mY - 1) || mWorld.HasFood(mX, mY - 1) || mWorld.HasGrass(mX, mY - 1)),
@@ -86,6 +87,7 @@ void Rabbit::Move()
 		mWorld.IsValid(mX - 1, mY) && (mWorld.IsEmpty(mX - 1, mY) || mWorld.HasFood(mX - 1, mY) || mWorld.HasGrass(mX - 1, mY))
 	};
 
+	// count movealbe cells
 	int moveableCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -95,12 +97,13 @@ void Rabbit::Move()
 		}
 	}
 
+	// count moveable cells
 	if (moveableCellCount == 0)
 	{
 		return;
 	}
 	
-	// 풀이 있는 셀 확인
+	// find grass cells
 	bool grassCell[4] =
 	{
 		moveableCell[0] && mWorld.HasGrass(mX, mY - 1),
@@ -109,6 +112,7 @@ void Rabbit::Move()
 		moveableCell[3] && mWorld.HasGrass(mX - 1, mY)
 	};
 
+	// count grass cells
 	int grassCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -119,18 +123,21 @@ void Rabbit::Move()
 	}
 
 	int direction;
+
+	// if grass cell is exist
 	if (grassCellCount > 0 )
 	{
-		// 풀이 있는 위치 중 랜덤하게 선택
+		// randomly select in grass cells
 		direction = rand() % grassCellCount;
 		while (grassCell[direction] == false)
 		{
 			direction = (direction + 1) % 4;
 		}
 	}
+	// if grass cell is not exist
 	else
 	{
-		// 움직 일 수 있는 위치 중 랜덤하게 선택
+		// randomly select in moveable but not grass cells
 		direction = rand() % moveableCellCount;
 		while (moveableCell[direction] == false || grassCell[direction] == true)
 		{
@@ -141,8 +148,8 @@ void Rabbit::Move()
 	int newX = mX;
 	int newY = mY;
 
-	// 선택된 방향쪽으로 새로운 좌표 대입
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
+	// set destination from direction
 	switch (direction)
 	{
 	case 0:
@@ -161,11 +168,11 @@ void Rabbit::Move()
 		assert("Not Valid Direction");
 	}
 
-	// 기존에 겹쳐있는 Piece를 저장 
+	// remove and temporary save obscured
 	Piece* alreadyObscured = mObscured;
 	mObscured = nullptr;
 	
-	// Grass가 있다면 제거 후 life를 최대치로
+	// if grass on destination, life to full and remove grass
 	if (mWorld.HasGrass(newX, newY))
 	{
 		Piece* grass = mWorld.RemovePiece(newX, newY);
@@ -174,15 +181,16 @@ void Rabbit::Move()
 		mLife = 6;
 	}
 
-	// 음식이 있다면 저장 후 World에서 임시 제거
+	// if food on destination, remove and save
 	else if (mWorld.HasFood(newX, newY))
 	{
 		mObscured = mWorld.RemovePiece(newX, newY);
 	}
-	
+
+	// move to destination
 	mWorld.MovePiece(mX, mY, newX, newY);
 
-	// 기존에 겹쳐있던 Piece를 이동 전 위치에 복원
+	// restore already obscured piece
 	if (alreadyObscured != nullptr)
 	{
 		mWorld.AddPiece(alreadyObscured);

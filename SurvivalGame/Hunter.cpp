@@ -37,16 +37,16 @@ void Hunter::Move(int direction)
 		return;
 	}
 	
-	// 기존에 겹쳐있는 Piece를 저장 
+	// temporary save obscured
 	Piece* alreadyObscured = mObscured;
 	mObscured = nullptr;
 
-	// 풀이 있다면 제거 후 저장
+	// if grass on destination, remove grass and save
 	if (mWorld.HasGrass(newX, newY))
 	{
 		mObscured = mWorld.RemovePiece(newX, newY);
 	}
-	// 음식이 있다면 제거 후 life를 최대치로
+	// if food on destination, remove and life to full
 	else if (mWorld.HasFood(newX, newY))
 	{
 		Piece* food = mWorld.RemovePiece(newX, newY);
@@ -55,9 +55,10 @@ void Hunter::Move(int direction)
 		mLife = 8;
 	}
 
+	// move to destination
 	mWorld.MovePiece(mX, mY, newX, newY);
 
-	// 기존에 겹쳐있던 Piece를 이동 전 위치에 복원
+	// if already have obscured, restore piece on source
 	if (alreadyObscured != nullptr)
 	{
 		mWorld.AddPiece(alreadyObscured);
@@ -73,7 +74,7 @@ void Hunter::Shoot(int direction)
 	int deltaY = 0;
 
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
-	// 방향에 따라 추가 되는 delta 값을 설정
+	// set delta value by direction
 	switch (direction)
 	{
 	case 0:
@@ -95,10 +96,10 @@ void Hunter::Shoot(int direction)
 	int targetX = mX + deltaX;
 	int targetY = mY + deltaY;
 
-	// 타겟의 위치가 그리드 밖으로 나갈 때 까지 반복
+	// repeat until target position is valid 
 	while(mWorld.IsValid(targetX, targetY))
 	{
-		// 만약 동물이라면 죽이고 음식을 생성
+		// if animal is on destination, kill and generate food
 		if (mWorld.HasRabbit(targetX, targetY) || mWorld.HasTiger(targetX, targetY))
 		{
 			Critter* killed = dynamic_cast<Critter*>(mWorld.RemovePiece(targetX, targetY));	

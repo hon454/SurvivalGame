@@ -8,13 +8,14 @@ bool Tiger::Breed()
 {
 	mIsActioned = true;
 
-	// check every 10 steps
+	// check step
 	if (mAliveStep == 0 || mAliveStep % 10 != 0)
 	{
 		return false;
 	}
 
 	// 0 : ‘Up’, 1: ‘Down’, 2 : ‘Right’, 3 : ‘Left
+	// find breedable cells
 	bool breedableCell[4] =
 	{
 		mWorld.IsValid(mX, mY - 1) && mWorld.CanBreed(mX, mY - 1),
@@ -23,6 +24,7 @@ bool Tiger::Breed()
 		mWorld.IsValid(mX - 1, mY) && mWorld.CanBreed(mX - 1, mY)
 	};
 
+	// count breedable cells
 	int breedableCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -32,18 +34,20 @@ bool Tiger::Breed()
 		}
 	}
 
+	// if no breedable cells, skip
 	if (breedableCellCount == 0)
 	{
 		return false;
 	}
 
+	// select randomly in breedable cells
 	int index = rand() % breedableCellCount;
 	while (breedableCell[index] == false)
 	{
 		index = (index + 1) % 4;
 	}
 
-	// 새끼를 낳을 수 있는 방향의 공간에 새끼를 생성
+	// breed to breedable cell
 	Tiger* child = nullptr;
 	switch (index)
 	{
@@ -63,7 +67,7 @@ bool Tiger::Breed()
 		assert("Not Valid Index");
 	}
 
-	// 새로 태어난 새끼는 움직이지 않도록 설정.
+	// child can not move step of birth
 	child->mIsActioned = true;
 
 	mWorld.AddPiece(child);
@@ -98,7 +102,7 @@ void Tiger::Move()
 		return;
 	}
 
-	// 사냥꾼이 존재하는 셀을 확인
+	// find hunter cell
 	bool hunterCell[4] =
 	{
 		moveableCell[0] && mWorld.HasHunter(mX, mY - 1),
@@ -107,6 +111,7 @@ void Tiger::Move()
 		moveableCell[3] && mWorld.HasHunter(mX - 1, mY)
 	};
 
+	// count hunter cell
 	int hunterCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -116,7 +121,7 @@ void Tiger::Move()
 		}
 	}
 
-	// 토끼가 존재하는 셀을 확인
+	// find rabbit cell
 	bool rabbitCell[4] =
 	{
 		moveableCell[0] && mWorld.HasRabbit(mX, mY - 1),
@@ -125,6 +130,7 @@ void Tiger::Move()
 		moveableCell[3] && mWorld.HasRabbit(mX - 1, mY)
 	};
 
+	// count rabbit cell
 	int rabbitCellCount = 0;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -137,7 +143,7 @@ void Tiger::Move()
 	int direction;
 	if (hunterCellCount > 0)
 	{
-		// 사냥꾼이 있는 위치 선택
+		// select direction of hunter
 		direction = rand() % hunterCellCount;
 		while (!hunterCell[direction])
 		{
@@ -146,7 +152,7 @@ void Tiger::Move()
 	}
 	else if(rabbitCellCount > 0)
 	{
-		// 토끼가 있는 위치 중 랜덤하게 선택
+		// select direction of rabbit, randomly 
 		direction = rand() % rabbitCellCount;
 		while (!rabbitCell[direction])
 		{
@@ -155,7 +161,7 @@ void Tiger::Move()
 	}
 	else
 	{
-		// 움직 일 수 있는 위치 중 랜덤하게 선택
+		// select direction of moveable(no hunter, no rabbit), randomly 
 		direction = rand() % moveableCellCount;
 		while (!moveableCell[direction] || hunterCell[direction] || rabbitCell[direction])
 		{	
@@ -184,17 +190,17 @@ void Tiger::Move()
 		assert("Not Valid Direction");
 	}
 
-	// 기존에 겹쳐있는 Piece를 저장 
+	// save temporary obscured
 	Piece* alreadyObscured = mObscured;
 	mObscured = nullptr;
 
-	// 사냥꾼이 있다면 제거 후 사망 시킴.
+	// if hunter is on destination, kill him
 	if (mWorld.HasHunter(newX, newY))
 	{
 		mWorld.KillHunter();
 	}
 	
-	// 토끼가 있다면 제거 후 life를 최대치로
+	// if rabbit is on destination, kill and life to full
 	else if (mWorld.HasRabbit(newX, newY))
 	{
 		Critter* rabbit = dynamic_cast<Critter*>(mWorld.RemovePiece(newX, newY));
@@ -208,7 +214,7 @@ void Tiger::Move()
 		mLife = 8;
 	}
 	
-	// 음식이나 Grass가 있다면 저장 후 World에서 임시 제거
+	// if food, grass on destination, remove and save
 	else if (mWorld.HasFood(newX, newY) || mWorld.HasGrass(newX, newY))
 	{
 		mObscured = mWorld.RemovePiece(newX, newY);
@@ -216,7 +222,7 @@ void Tiger::Move()
 
 	mWorld.MovePiece(mX, mY, newX, newY);
 
-	// 기존에 겹쳐있던 Piece를 이동 전 위치에 복원
+	// restore already obscured
 	if (alreadyObscured != nullptr)
 	{
 		mWorld.AddPiece(alreadyObscured);
