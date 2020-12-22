@@ -6,7 +6,7 @@ class World;
 class Piece
 {
 public:
-	Piece(World& w, int x, int y, char initial) : mWorld(w), mX(x), mY(y), mInitial(initial) {}
+	Piece(World& w, int x, int y, char initial) : mX(x), mY(y), mInitial(initial), mWorld(w) {}
 	virtual ~Piece() = default;
 	int GetX() const { return mX; }
 	int GetY() const { return mY; }

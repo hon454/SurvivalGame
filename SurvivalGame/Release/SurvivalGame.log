@@ -1,12 +1,11 @@
-﻿  Critter.cpp
-  Hunter.cpp
+﻿  Hunter.cpp
   Main.cpp
-C:\Users\hon45\Documents\GitHub\SurvivalGame\SurvivalGame\Main.cpp(10,12): warning C4244: '인수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Rabbit.cpp
   Tiger.cpp
   World.cpp
   코드를 생성하고 있습니다.
-  Previous IPDB not found, fall back to full compilation.
-  All 76 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  26 of 76 functions (34.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   SurvivalGame.vcxproj -> C:\Users\hon45\Documents\GitHub\SurvivalGame\Release\SurvivalGame.exe
