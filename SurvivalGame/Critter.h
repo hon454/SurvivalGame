@@ -25,7 +25,7 @@ protected:
 	int mLife;
 	int mAliveStep;
 	bool mIsActioned;
-	Piece* mObscured;
+	Piece* mObscured = nullptr;
 };
 
 #endif

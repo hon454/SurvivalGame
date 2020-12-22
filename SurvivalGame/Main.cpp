@@ -9,7 +9,7 @@ using namespace std;
 
 int main(void)
 {
-	srand(time(NULL));
+	srand(static_cast<unsigned>(time(nullptr)));
 	
 	int H, W, G, R, T;	
 	
