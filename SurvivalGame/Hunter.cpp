@@ -102,9 +102,12 @@ void Hunter::Shoot(int direction)
 		// if animal is on destination, kill and generate food
 		if (mWorld.HasRabbit(targetX, targetY) || mWorld.HasTiger(targetX, targetY))
 		{
-			Critter* killed = dynamic_cast<Critter*>(mWorld.RemovePiece(targetX, targetY));	
+			Critter* killed = dynamic_cast<Critter*>(mWorld.RemovePiece(targetX, targetY));
+
+			// if animal have obscured, remove from memory
 			Piece* obscured = killed->GetObscured();
 			delete obscured;
+			
 			delete killed;
 			mWorld.AddPiece(new Food(mWorld, targetX, targetY));
 			break;
